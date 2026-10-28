@@ -145,4 +145,47 @@ public class Trabalho3 {
             tabela[posicao] = nova[posicao];
         }
     }
+
+    // Gera um vetor de chaves distintas de 7 dígitos e retorna o vetor gerado
+    public static int[] geraChaves(Random sorteio, int quantidade) {
+        int[] chaves = new int[quantidade];
+        int gerados = 0;
+        duplicadasDescartadas = 0;
+        while (gerados < quantidade) {
+            int candidata = 1000000 + sorteio.nextInt(9000000);
+            boolean repetida = false;
+            for (int indice = 0; indice < gerados; indice++) {
+                if (chaves[indice] == candidata) {
+                    repetida = true;
+                }
+            }
+            if (repetida) {
+                duplicadasDescartadas++;
+            } else {
+                chaves[gerados] = candidata;
+                gerados++;
+            }
+        }
+        return chaves;
+    }
+
+    // Gera um vetor de chaves de 7 dígitos que não estão no vetor chaves e retorna o vetor gerado
+    public static int[] geraAusentes(Random sorteio, int[] chaves, int quantidade) {
+        int[] ausentes = new int[quantidade];
+        int gerados = 0;
+        while (gerados < quantidade) {
+            int candidata = 1000000 + sorteio.nextInt(9000000);
+            boolean existe = false;
+            for (int indice = 0; indice < chaves.length; indice++) {
+                if (chaves[indice] == candidata) {
+                    existe = true;
+                }
+            }
+            if (!existe) {
+                ausentes[gerados] = candidata;
+                gerados++;
+            }
+        }
+        return ausentes;
+    }
 }
