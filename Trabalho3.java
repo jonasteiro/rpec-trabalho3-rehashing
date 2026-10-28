@@ -97,4 +97,52 @@ public class Trabalho3 {
         tabela[posicao] = REMOVIDO;
         return true;
     }
+
+    // Insere uma chave na tabela (reaproveitando REMOVIDO, se possível) e retorna a posição, -1 se duplicada ou -2 se cheia
+    public static int insere(int[] tabela, int chave) {
+        int tamanho = tabela.length;
+        int posicao = funcaoHash(chave, tamanho);
+        int passos = 0;
+        int primeiraRemovida = -1;
+        while (passos < tamanho) {
+            acessos++;
+            passos++;
+            if (tabela[posicao] == VAZIO) {
+                if (primeiraRemovida != -1) {
+                    tabela[primeiraRemovida] = chave;
+                    reaproveitamentos++;
+                    return primeiraRemovida;
+                } else {
+                    tabela[posicao] = chave;
+                    return posicao;
+                }
+            }
+            if (tabela[posicao] == chave) {
+                return -1;
+            }
+            if (tabela[posicao] == REMOVIDO && primeiraRemovida == -1) {
+                primeiraRemovida = posicao;
+            }
+            posicao = rehash(posicao, tamanho);
+        }
+        if (primeiraRemovida != -1) {
+            tabela[primeiraRemovida] = chave;
+            reaproveitamentos++;
+            return primeiraRemovida;
+        }
+        return -2;
+    }
+
+    // Reconstrói a tabela em uma nova tabela limpa sem posições REMOVIDO
+    public static void reorganiza(int[] tabela) {
+        int[] nova = criaTabela(tabela.length);
+        for (int posicao = 0; posicao < tabela.length; posicao++) {
+            if (tabela[posicao] >= 0) {
+                insere(nova, tabela[posicao]);
+            }
+        }
+        for (int posicao = 0; posicao < tabela.length; posicao++) {
+            tabela[posicao] = nova[posicao];
+        }
+    }
 }
