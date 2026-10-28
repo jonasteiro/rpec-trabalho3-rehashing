@@ -188,4 +188,311 @@ public class Trabalho3 {
         }
         return ausentes;
     }
+
+    // Imprime o resultado de um teste de validacao e retorna 1 se aprovado ou 0 se reprovado.
+    static int registraTeste(String codigo, boolean passou) {
+        if (passou) {
+            System.out.println("TESTE " + codigo + ": APROVADO");
+            return 1;
+        } else {
+            System.out.println("TESTE " + codigo + ": REPROVADO");
+            return 0;
+        }
+    }
+
+    // Executa os 26 testes de validação e imprime se cada um foi aprovado ou reprovado
+    public static void executaTestes() {
+        int aprovados = 0;
+
+        // Teste G1: sorteia 5 chaves e confere se são iguais aos do PDF
+        Random sorteio = new Random(1990);
+        int[] chaves = geraChaves(sorteio, 5);
+        if (chaves[0] == 4429279 && chaves[1] == 3976163 && chaves[2] == 9187615
+                && chaves[3] == 1167825 && chaves[4] == 9651672 && duplicadasDescartadas == 0) {
+            System.out.println("TESTE G1: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE G1: REPROVADO");
+        }
+
+        // Teste G2: continua com o mesmo sorteio, gera 3 ausentes e confere os valores
+        int[] ausentes = geraAusentes(sorteio, chaves, 3);
+        if (ausentes[0] == 8282916 && ausentes[1] == 7251645 && ausentes[2] == 6739522) {
+            System.out.println("TESTE G2: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE G2: REPROVADO");
+        }
+
+        // Teste G3: cria um novo Random(1990), gera 700 chaves e confere a última (posicao 699)
+        sorteio = new Random(1990);
+        chaves = geraChaves(sorteio, 700);
+        if (chaves[699] == 9691227) {
+            System.out.println("TESTE G3: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE G3: REPROVADO");
+        }
+
+        // Teste G4: continua com o mesmo sorteio, gera 350 ausentes e confere 4 posições delas
+        ausentes = geraAusentes(sorteio, chaves, 350);
+        if (ausentes[0] == 7816661 && ausentes[1] == 1376564
+                && ausentes[2] == 1172019 && ausentes[349] == 6734863) {
+            System.out.println("TESTE G4: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE G4: REPROVADO");
+        }
+
+        // Teste N1: cria tabela de 11 posições e insere 22, 33, 44 e 55
+        int[] tabela = criaTabela(11);
+        int retorno1 = insere(tabela, 22);
+        int retorno2 = insere(tabela, 33);
+        int retorno3 = insere(tabela, 44);
+        int retorno4 = insere(tabela, 55);
+        if (retorno1 == 0 && retorno2 == 1 && retorno3 == 2 && retorno4 == 3
+                && tabela[0] == 22 && tabela[1] == 33 && tabela[2] == 44 && tabela[3] == 55
+                && contaVazias(tabela) == 7) {
+            System.out.println("TESTE N1: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE N1: REPROVADO");
+        }
+
+        // Teste N2: remove a chave 33 com removeIngenua e confere se a posição 1 virou VAZIO
+        boolean removeu = removeIngenua(tabela, 33);
+        if (removeu && tabela[1] == VAZIO) {
+            System.out.println("TESTE N2: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE N2: REPROVADO");
+        }
+
+        // Teste N3: busca a chave 44 (que dá defeito e retorna -1 por causa do VAZIO na posição 1)
+        acessos = 0;
+        int resultado = busca(tabela, 44);
+        if (resultado == -1 && acessos == 2) {
+            System.out.println("TESTE N3: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE N3: REPROVADO");
+        }
+
+        // Teste N4: busca a chave 55 (que também dá defeito e retorna -1 com 2 acessos)
+        acessos = 0;
+        resultado = busca(tabela, 55);
+        if (resultado == -1 && acessos == 2) {
+            System.out.println("TESTE N4: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE N4: REPROVADO");
+        }
+
+        // Teste C1: cria tabela nova de 11, insere 22, 33, 44 e 55 e remove 33 com remove (correta)
+        tabela = criaTabela(11);
+        insere(tabela, 22);
+        insere(tabela, 33);
+        insere(tabela, 44);
+        insere(tabela, 55);
+        reaproveitamentos = 0;
+        removeu = remove(tabela, 33);
+        if (removeu && tabela[1] == REMOVIDO) {
+            System.out.println("TESTE C1: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE C1: REPROVADO");
+        }
+
+        // Teste C2: busca a chave 44 (agora encontra na posição 2 com 3 acessos: posições 0, 1 e 2)
+        acessos = 0;
+        resultado = busca(tabela, 44);
+        if (resultado == 2 && acessos == 3) {
+            System.out.println("TESTE C2: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE C2: REPROVADO");
+        }
+
+        // Teste C3: busca a chave 55 (encontra na posição 3 com 4 acessos: posições 0, 1, 2 e 3)
+        acessos = 0;
+        resultado = busca(tabela, 55);
+        if (resultado == 3 && acessos == 4) {
+            System.out.println("TESTE C3: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE C3: REPROVADO");
+        }
+
+        // Teste C4: busca a chave 77 (ausente, olha as posições 0, 1, 2, 3 e para no VAZIO da posição 4 = 5 acessos)
+        acessos = 0;
+        resultado = busca(tabela, 77);
+        if (resultado == -1 && acessos == 5) {
+            System.out.println("TESTE C4: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE C4: REPROVADO");
+        }
+
+        // Teste C5: busca a chave 33 (já removida, olha de 0 a 4 e retorna -1 com 5 acessos)
+        acessos = 0;
+        resultado = busca(tabela, 33);
+        if (resultado == -1 && acessos == 5) {
+            System.out.println("TESTE C5: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE C5: REPROVADO");
+        }
+
+        // Teste C6: tenta remover 99 (ausente, retorna false com 5 acessos, mantendo 3 ocupadas e 1 removida)
+        acessos = 0;
+        removeu = remove(tabela, 99);
+        if (!removeu && acessos == 5 && contaOcupadas(tabela) == 3 && contaRemovidas(tabela) == 1) {
+            System.out.println("TESTE C6: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE C6: REPROVADO");
+        }
+
+        // Teste C7: tenta inserir 44 (duplicada, passa pelo REMOVIDO na posição 1, vê o 44 na posição 2 e retorna -1)
+        acessos = 0;
+        reaproveitamentos = 0;
+        resultado = insere(tabela, 44);
+        if (resultado == -1 && acessos == 3 && reaproveitamentos == 0) {
+            System.out.println("TESTE C7: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE C7: REPROVADO");
+        }
+
+        // Teste C8: insere 66 (vai até o VAZIO na posição 4 com 5 acessos e grava sobre o REMOVIDO da posição 1)
+        acessos = 0;
+        reaproveitamentos = 0;
+        resultado = insere(tabela, 66);
+        if (resultado == 1 && acessos == 5 && reaproveitamentos == 1
+                && tabela[1] == 66 && contaRemovidas(tabela) == 0) {
+            System.out.println("TESTE C8: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE C8: REPROVADO");
+        }
+
+        // 6.4 Tabela de 3 posições, sem laço infinito (F1 a F5)
+        // Teste F1: cria tabela de 3 posições, lota com 3, 6 e 9 e busca 12 (para após 3 acessos)
+        tabela = criaTabela(3);
+        insere(tabela, 3);
+        insere(tabela, 6);
+        insere(tabela, 9);
+        acessos = 0;
+        resultado = busca(tabela, 12);
+        if (tabela[0] == 3 && tabela[1] == 6 && tabela[2] == 9
+                && resultado == -1 && acessos == 3) {
+            System.out.println("TESTE F1: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE F1: REPROVADO");
+        }
+
+        // Teste F2: tenta inserir 12 na tabela cheia (retorna -2 após 3 acessos)
+        acessos = 0;
+        resultado = insere(tabela, 12);
+        if (resultado == -2 && acessos == 3) {
+            System.out.println("TESTE F2: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE F2: REPROVADO");
+        }
+
+        // Teste F3: remove 6 (posição 1 vira REMOVIDO) e busca 12 (termina após 3 acessos mesmo sem VAZIO)
+        remove(tabela, 6);
+        acessos = 0;
+        resultado = busca(tabela, 12);
+        if (tabela[1] == REMOVIDO && resultado == -1 && acessos == 3) {
+            System.out.println("TESTE F3: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE F3: REPROVADO");
+        }
+
+        // Teste F4: insere 12 (dá a volta completa com 3 acessos e reaproveita o REMOVIDO da posição 1)
+        acessos = 0;
+        reaproveitamentos = 0;
+        resultado = insere(tabela, 12);
+        if (resultado == 1 && acessos == 3 && reaproveitamentos == 1 && tabela[1] == 12) {
+            System.out.println("TESTE F4: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE F4: REPROVADO");
+        }
+
+        // Teste F5: busca 15 na tabela cheia de novo (retorna -1 após 3 acessos)
+        acessos = 0;
+        resultado = busca(tabela, 15);
+        if (resultado == -1 && acessos == 3) {
+            System.out.println("TESTE F5: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE F5: REPROVADO");
+        }
+
+        // 6.5 Reorganização (O1 a O5)
+        // Teste O1: insere 22, 33, 44, 55 em tabela de 11, remove 33 e chama reorganiza
+        tabela = criaTabela(11);
+        insere(tabela, 22);
+        insere(tabela, 33);
+        insere(tabela, 44);
+        insere(tabela, 55);
+        remove(tabela, 33);
+        reorganiza(tabela);
+        if (tabela[0] == 22 && tabela[1] == 44 && tabela[2] == 55 && tabela[3] == VAZIO
+                && contaRemovidas(tabela) == 0 && contaOcupadas(tabela) == 3) {
+            System.out.println("TESTE O1: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE O1: REPROVADO");
+        }
+
+        // Teste O2: busca 55 na tabela reorganizada de O1 (agora está na vaga 2, com 3 acessos)
+        acessos = 0;
+        resultado = busca(tabela, 55);
+        if (resultado == 2 && acessos == 3) {
+            System.out.println("TESTE O2: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE O2: REPROVADO");
+        }
+
+        // Teste O3: cria tabela de 11, insere 12 (posição 1), 22 (posição 0) e 33 (colide na 0 e na 1, vai pra 2), remove 22
+        tabela = criaTabela(11);
+        insere(tabela, 12);
+        insere(tabela, 22);
+        insere(tabela, 33);
+        remove(tabela, 22);
+        if (tabela[0] == REMOVIDO && tabela[1] == 12 && tabela[2] == 33) {
+            System.out.println("TESTE O3: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE O3: REPROVADO");
+        }
+
+        // Teste O4: reorganiza a tabela de O3 (o 33 volta para a posição 0 e o 12 fica na posição 1)
+        reorganiza(tabela);
+        if (tabela[0] == 33 && tabela[1] == 12 && tabela[2] == VAZIO && contaRemovidas(tabela) == 0) {
+            System.out.println("TESTE O4: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE O4: REPROVADO");
+        }
+
+        // Teste O5: busca 33 na tabela de O4 (encontra direto na posição 0 com apenas 1 acesso)
+        acessos = 0;
+        resultado = busca(tabela, 33);
+        if (resultado == 0 && acessos == 1) {
+            System.out.println("TESTE O5: APROVADO");
+            aprovados++;
+        } else {
+            System.out.println("TESTE O5: REPROVADO");
+        }
+
+        System.out.println("TESTES: " + aprovados + " de 26 aprovados");
+    }
 }
