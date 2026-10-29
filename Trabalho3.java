@@ -189,17 +189,6 @@ public class Trabalho3 {
         return ausentes;
     }
 
-    // Imprime o resultado de um teste de validacao e retorna 1 se aprovado ou 0 se reprovado.
-    static int registraTeste(String codigo, boolean passou) {
-        if (passou) {
-            System.out.println("TESTE " + codigo + ": APROVADO");
-            return 1;
-        } else {
-            System.out.println("TESTE " + codigo + ": REPROVADO");
-            return 0;
-        }
-    }
-
     // Executa os 26 testes de validação e imprime se cada um foi aprovado ou reprovado
     public static void executaTestes() {
         int aprovados = 0;
@@ -494,5 +483,170 @@ public class Trabalho3 {
         }
 
         System.out.println("TESTES: " + aprovados + " de 26 aprovados");
+    }
+
+    // Executa os 5 experimentos em uma tabela de 1000 posições e imprime os resultados
+    static void executaExperimentos() {
+        Random sorteio = new Random(1990);
+        int[] chaves = geraChaves(sorteio, 700);
+        int descartadas = duplicadasDescartadas;
+        int[] ausentes = geraAusentes(sorteio, chaves, 350);
+
+        // Experimento 0: antes das remoções
+        int[] tabela0 = criaTabela(1000);
+        for (int indice = 0; indice < 700; indice++) {
+            insere(tabela0, chaves[indice]);
+        }
+
+        acessos = 0;
+        for (int indice = 1; indice < 700; indice += 2) {
+            busca(tabela0, chaves[indice]);
+        }
+
+        float acessosSucessoMedia0 = (float) acessos / 350;
+
+        acessos = 0;
+        for (int indice = 0; indice < 350; indice++) {
+            busca(tabela0, ausentes[indice]);
+        }
+
+        float acessosFalhaMedia0 = (float) acessos / 350;
+        System.out.printf("EXPERIMENTO 0 (antes das remocoes): ocupadas=%d removidas=%d vazias=%d acessosSucessoMedia=%.2f acessosFalhaMedia=%.2f%n",
+                contaOcupadas(tabela0), contaRemovidas(tabela0), contaVazias(tabela0), acessosSucessoMedia0, acessosFalhaMedia0);
+
+        // Experimento 1: remoção ingênua
+        int[] tabela1 = criaTabela(1000);
+        for (int indice = 0; indice < 700; indice++) {
+            insere(tabela1, chaves[indice]);
+        }
+
+        int removidasComSucesso1 = 0;
+        for (int indice = 0; indice < 700; indice += 2) {
+            if (removeIngenua(tabela1, chaves[indice])) {
+                removidasComSucesso1++;
+            }
+        }
+
+        int falsosNegativos1 = 0;
+        for (int indice = 1; indice < 700; indice += 2) {
+            if (busca(tabela1, chaves[indice]) == -1) {
+                falsosNegativos1++;
+            }
+        }
+
+        System.out.printf("EXPERIMENTO 1 (remocao ingenua): removidasComSucesso=%d falsosNegativos=%d ocupadas=%d vazias=%d%n",
+                removidasComSucesso1, falsosNegativos1, contaOcupadas(tabela1), contaVazias(tabela1));
+
+        // Experimento 2: remoção correta (com REMOVIDO)
+        int[] tabela2 = criaTabela(1000);
+        for (int indice = 0; indice < 700; indice++) {
+            insere(tabela2, chaves[indice]);
+        }
+
+        int removidasComSucesso2 = 0;
+        for (int indice = 0; indice < 700; indice += 2) {
+            if (remove(tabela2, chaves[indice])) {
+                removidasComSucesso2++;
+            }
+        }
+
+        int falsosNegativos2 = 0;
+        for (int indice = 1; indice < 700; indice += 2) {
+            if (busca(tabela2, chaves[indice]) == -1) {
+                falsosNegativos2++;
+            }
+        }
+
+        acessos = 0;
+        for (int indice = 1; indice < 700; indice += 2) {
+            busca(tabela2, chaves[indice]);
+        }
+
+        float acessosSucessoMedia2 = (float) acessos / 350;
+        acessos = 0;
+
+        for (int indice = 0; indice < 350; indice++) {
+            busca(tabela2, ausentes[indice]);
+        }
+
+        float acessosFalhaMedia2 = (float) acessos / 350;
+        System.out.printf("EXPERIMENTO 2 (remocao com REMOVIDO): removidasComSucesso=%d falsosNegativos=%d ocupadas=%d removidas=%d vazias=%d acessosSucessoMedia=%.2f acessosFalhaMedia=%.2f%n",
+                removidasComSucesso2, falsosNegativos2, contaOcupadas(tabela2), contaRemovidas(tabela2), contaVazias(tabela2), acessosSucessoMedia2, acessosFalhaMedia2);
+
+        // Experimento 3: após reorganiza (usa a mesma tabela2 do Experimento 2)
+        reorganiza(tabela2);
+        int falsosNegativos3 = 0;
+        for (int indice = 1; indice < 700; indice += 2) {
+            if (busca(tabela2, chaves[indice]) == -1) {
+                falsosNegativos3++;
+            }
+        }
+
+        acessos = 0;
+        for (int indice = 1; indice < 700; indice += 2) {
+            busca(tabela2, chaves[indice]);
+        }
+
+        float acessosSucessoMedia3 = (float) acessos / 350;
+        acessos = 0;
+        for (int indice = 0; indice < 350; indice++) {
+            busca(tabela2, ausentes[indice]);
+        }
+
+        float acessosFalhaMedia3 = (float) acessos / 350;
+        System.out.printf("EXPERIMENTO 3 (apos reorganiza): falsosNegativos=%d ocupadas=%d removidas=%d vazias=%d acessosSucessoMedia=%.2f acessosFalhaMedia=%.2f%n",
+                falsosNegativos3, contaOcupadas(tabela2), contaRemovidas(tabela2), contaVazias(tabela2), acessosSucessoMedia3, acessosFalhaMedia3);
+
+        // Experimento 4: reinserção
+        int[] tabela4 = criaTabela(1000);
+        for (int indice = 0; indice < 700; indice++) {
+            insere(tabela4, chaves[indice]);
+        }
+
+        for (int indice = 0; indice < 700; indice += 2) {
+            remove(tabela4, chaves[indice]);
+        }
+
+        reaproveitamentos = 0;
+        int inseridas4 = 0;
+
+        for (int indice = 0; indice < 350; indice++) {
+            if (insere(tabela4, ausentes[indice]) >= 0) {
+                inseridas4++;
+            }
+        }
+
+        int reaproveitamentos4 = reaproveitamentos;
+        int falsosNegativos4 = 0;
+        for (int indice = 1; indice < 700; indice += 2) {
+            if (busca(tabela4, chaves[indice]) == -1) {
+                falsosNegativos4++;
+            }
+        }
+
+        for (int indice = 0; indice < 350; indice++) {
+            if (busca(tabela4, ausentes[indice]) == -1) {
+                falsosNegativos4++;
+            }
+        }
+
+        acessos = 0;
+        for (int indice = 1; indice < 700; indice += 2) {
+            busca(tabela4, chaves[indice]);
+        }
+
+        for (int indice = 0; indice < 350; indice++) {
+            busca(tabela4, ausentes[indice]);
+        }
+
+        float acessosSucessoMedia4 = (float) acessos / 700;
+        System.out.printf("EXPERIMENTO 4 (reinsercao): inseridas=%d reaproveitamentos=%d falsosNegativos=%d ocupadas=%d removidas=%d vazias=%d acessosSucessoMedia=%.2f%n",
+                inseridas4, reaproveitamentos4, falsosNegativos4, contaOcupadas(tabela4), contaRemovidas(tabela4), contaVazias(tabela4), acessosSucessoMedia4);
+    }
+
+    // Ponto de entrada do programa que executa os testes de validação e depois os experimentos
+    public static void main(String[] args) {
+        executaTestes();
+        executaExperimentos();
     }
 }
